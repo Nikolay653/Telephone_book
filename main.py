@@ -100,8 +100,9 @@ def print_menu() -> str:
     print(' 4.  Добавить контакт')
     print(' 5.  Удалить контакт')
     print(' 6.  Показать список контактов')
-    print(' 7.  Помощь')
-    print(' 8.  Выйти')
+    print(' 7.  Изменить контакт')
+    print(' 8.  Помощь')
+    print(' 9.  Выйти')
     print()
     return input(' Введите номер пункта меню >>> ')
 
@@ -260,6 +261,43 @@ def help():
     print(help)
 
 
+def change_help(data: str, t: str) -> str:
+    """
+    Вспомогательная ф-я меню для изменения контакта
+    :param data: данные для изменения
+    :param t: имя атрибута (Имя, фамилия, телефон)
+    :return: возвращает старое значение или новую
+    """
+    comm = input(f' Изменить {t} {data} Y - да, N - оставить: ')
+    if comm in ['N', 'n', 'т', 'Т']:
+        return data
+    else:
+        inp = input(f' Введите новое {t}: ')
+        return inp
+
+
+def change_contact(data_contacts:dict[str]) -> dict[str]:
+    """
+    Изменяет контакт
+    :param data_contacts: список контактов
+    :return: новый список контактов
+    """
+    if data_contacts:
+        print_contact(data_contacts['data'])
+        ren_item = input(' Введите номер для изменения: ')
+        int_ren_items = int(ren_item if ren_item.isdigit() and ren_item != '' else '-1')
+        if int_ren_items != -1 and int_ren_items <= len(data_contacts['data']):
+            reneim= data_contacts['data'].pop(int_ren_items - 1)
+            name = change_help(reneim['name'], 'Имя')
+            l_name = change_help(reneim['last_name'], 'Фамилию')
+            r_phone = change_help(reneim['phone'], 'телефон')
+            data_contacts['data'].append({'name': name, 'last_name': l_name, 'phone': r_phone})
+            return data_contacts
+    else:
+        print()
+        print(' !!! Не загружена база контактов')
+
+
 def main():
     current_file_path = ''
     exit = True
@@ -311,10 +349,14 @@ def main():
             nomer_menu = print_menu()
 
         elif nomer_menu == '7':
-            help()
+            current_contact = change_contact(current_contact)
             nomer_menu = print_menu()
 
         elif nomer_menu == '8':
+            help()
+            nomer_menu = print_menu()
+
+        elif nomer_menu == '9':
             # Сохранить базу контактов
             if current_file_path:
                 y_n = input(' !!! База не сохранена, сохранить <Y, N> <Д/Н>: ')
